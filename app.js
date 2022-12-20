@@ -1,23 +1,20 @@
-// Importing the required modules
-const WebSocketServer = require('ws');
- 
-// Creating a new websocket server
-const wss = new WebSocketServer.Server({ port: 8080 })
- 
-// Creating connection using websocket
-wss.on("connection", ws => {
-    console.log("new client connected");
-    // sending message
-    ws.on("message", data => {
-        console.log(`Client has sent us: ${data}`)
-    });
-    // handling what to do when clients disconnects from server
-    ws.on("close", () => {
-        console.log("the client has connected");
-    });
-    // handling client connection error
-    ws.onerror = function () {
-        console.log("Some Error occurred")
-    }
+const express = require('express');
+const app = express();
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
+
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
 });
-console.log("The WebSocket server is running on port 8080");
+
+io.on('connection', (socket) => {
+    socket.on('chat message', (msg) => {
+      console.log('message: ' + msg);
+    });
+  });
+
+server.listen(8080, () => {
+  console.log('listening on *:8080');
+});
